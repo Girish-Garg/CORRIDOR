@@ -1,14 +1,16 @@
 import { RerouteOption } from "../lib/api"
-import { fmtPct, fmtInt } from "../lib/format"
+import { fmtPct } from "../lib/format"
+import { SectionLabel } from "./Section"
 
 export function RerouteCards({ options, runKey }: { options: RerouteOption[]; runKey: number }) {
   return (
-    <div className="tick panel p-6">
-      <div className="flex items-center justify-between">
-        <div className="label">Recommended reroutes</div>
-        <div className="label">{options.length} options ranked</div>
-      </div>
-      <div className="mt-4 space-y-2">
+    <div className="panel p-5">
+      <SectionLabel
+        n="4.0"
+        title="Recommended reroutes"
+        right={<span className="meta">{options.length} ranked</span>}
+      />
+      <div className="divide-y divide-line">
         {options.map((o, i) => (
           <Row key={`${runKey}-${o.id}`} o={o} rank={i + 1} />
         ))}
@@ -20,50 +22,36 @@ export function RerouteCards({ options, runKey }: { options: RerouteOption[]; ru
 function Row({ o, rank }: { o: RerouteOption; rank: number }) {
   const top = rank === 1
   return (
-    <div
-      className={`grid grid-cols-[auto_1fr_auto] items-center gap-4 border px-4 py-3 transition-colors ${
-        top ? "border-cyan/50 bg-cyan/5" : "border-line bg-bg2 hover:border-linebright"
-      }`}
-    >
-      <div className={`mono text-[26px] font-bold tnum ${top ? "text-cyan" : "text-faint"}`}>{rank}</div>
-
+    <div className="grid grid-cols-[26px_1fr_auto] items-center gap-4 py-3.5">
+      <span className={`mono text-[14px] tnum ${top ? "text-accent" : "text-faint"}`}>
+        {String(rank).padStart(2, "0")}
+      </span>
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-2">
-          <span className="font-display text-[16px] font-bold text-ink">{o.source}</span>
-          <span className="mono text-[12px] text-dim">{o.grade}</span>
+        <div className="flex flex-wrap items-baseline gap-2">
+          <span className="text-[14px] font-semibold tracking-tight text-fg">{o.source}</span>
+          <span className="mono text-[12px] text-muted">{o.grade}</span>
           {o.avoids_hormuz && (
-            <span className="mono border border-cyan/40 px-1.5 py-0.5 text-[9px] uppercase tracking-wider text-cyan">
-              Avoids Hormuz
+            <span className="mono rounded border border-line2 px-1.5 py-px text-[10px] text-faint">
+              avoids Hormuz
             </span>
           )}
         </div>
-        <div className="mono mt-1 text-[11px] text-faint">{o.route}</div>
-        <div className="mono mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] tnum text-dim">
-          <span>
-            landed <span className="text-ink">${o.landed_price_usd_bbl.toFixed(1)}</span>
-          </span>
-          <span>{o.days_to_refinery}d to refinery</span>
-          <span>
-            grade fit <span className="text-ink">{fmtPct(o.grade_fit)}</span>
-          </span>
-          <span>
-            tanker <span className="text-ink">{fmtPct(o.tanker_availability)}</span>
-          </span>
-          <span>{fmtInt(o.available_volume_bbl / 1000)}k bbl</span>
+        <div className="mono mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] tnum text-faint">
+          <span>{o.route}</span>
+          <span>landed ${o.landed_price_usd_bbl.toFixed(1)}</span>
+          <span>{o.days_to_refinery}d</span>
+          <span>grade {fmtPct(o.grade_fit)}</span>
+          <span>tanker {fmtPct(o.tanker_availability)}</span>
         </div>
       </div>
-
-      <div className="w-28 text-right">
-        <div className={`mono text-[18px] font-bold tnum ${top ? "text-cyan" : "text-ink"}`}>
-          {o.composite_score.toFixed(2)}
-        </div>
-        <div className="mt-1.5 h-1 w-full overflow-hidden bg-line">
+      <div className="w-24 text-right">
+        <div className="mono text-[15px] font-medium tnum text-fg">{o.composite_score.toFixed(2)}</div>
+        <div className="mt-1.5 h-[3px] w-full overflow-hidden rounded-full bg-line">
           <div
-            className={`gauge-fill h-full ${top ? "bg-cyan" : "bg-dim"}`}
+            className={`gauge h-full ${top ? "bg-accent" : "bg-faint"}`}
             style={{ width: `${Math.round(o.composite_score * 100)}%` }}
           />
         </div>
-        {o.source_doc_id && <div className="label mt-2 !text-[9px]">src · {o.source_doc_id}</div>}
       </div>
     </div>
   )

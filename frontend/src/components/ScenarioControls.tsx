@@ -1,8 +1,8 @@
 import { Assumption } from "../lib/api"
 import { fmtPct, fmtMbbl } from "../lib/format"
+import { SectionLabel } from "./Section"
 
 const SHOWN = ["hormuz_dependency", "reserve_days", "india_daily_imports_bbl", "baseline_brent_usd"]
-
 const LABELS: Record<string, string> = {
   hormuz_dependency: "Hormuz dependency",
   reserve_days: "Reserve cover",
@@ -29,50 +29,35 @@ export function ScenarioControls({
 }) {
   const chips = SHOWN.map((n) => assumptions.find((a) => a.name === n)).filter(Boolean) as Assumption[]
   return (
-    <div className="tick panel p-5">
-      <div className="label">Active scenario</div>
-      <h2 className="mt-3 font-display text-[26px] font-extrabold leading-[1.05] text-ink">
-        Strait of Hormuz
-        <br />
-        <span className="text-amber">Full Closure</span>
+    <div className="panel p-5">
+      <SectionLabel n="1.0" title="Scenario" />
+      <h2 className="text-[22px] font-bold leading-tight tracking-tightest text-fg">
+        Strait of Hormuz, full closure
       </h2>
-      <p className="mt-3 text-[13px] leading-relaxed text-dim">
-        Model the procurement shock if transit through Hormuz halts, and rank the crude reroutes that
-        keep Indian refineries supplied.
+      <p className="mt-2 text-[13px] leading-relaxed text-muted">
+        Model the procurement shock if transit halts, and rank the crude reroutes that keep Indian
+        refineries supplied.
       </p>
 
       <button
         onClick={onRun}
         disabled={loading}
-        className="btn-sweep mt-5 flex w-full items-center justify-center gap-2 border border-amber bg-amber/10 px-4 py-3 font-mono text-[12px] font-semibold uppercase tracking-[0.16em] text-amber transition-colors hover:bg-amber/20 disabled:opacity-60"
+        className="mt-5 w-full rounded-md border border-line2 bg-surface2 px-4 py-2.5 text-[13px] font-semibold text-fg transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
       >
-        {loading ? (
-          <>
-            Modeling
-            <span className="inline-flex gap-1">
-              <span className="h-1 w-1 animate-bounce rounded-full bg-amber [animation-delay:-0.2s]" />
-              <span className="h-1 w-1 animate-bounce rounded-full bg-amber [animation-delay:-0.1s]" />
-              <span className="h-1 w-1 animate-bounce rounded-full bg-amber" />
-            </span>
-          </>
-        ) : (
-          "Run disruption model"
-        )}
+        {loading ? "Running model…" : "Run disruption model"}
       </button>
 
-      <div className="label mt-6">Assumptions · editable · sourced</div>
-      <div className="mt-3 space-y-2">
-        {chips.length === 0 && <div className="mono text-[11px] text-faint">loading parameters…</div>}
-        {chips.map((a) => (
-          <div
-            key={a.name}
-            title={a.rationale}
-            className="flex items-center justify-between border-b border-line/60 pb-2"
-          >
-            <span className="text-[12px] text-dim">{LABELS[a.name] ?? a.name}</span>
-            <span className="mono text-[12px] tnum text-ink">{chipValue(a)}</span>
-          </div>
-        ))}
+      <div className="mt-6">
+        <SectionLabel n="1.1" title="Assumptions · editable · sourced" />
+        <div className="space-y-2.5">
+          {chips.length === 0 && <div className="mono text-[12px] text-faint">loading…</div>}
+          {chips.map((a) => (
+            <div key={a.name} title={a.rationale} className="flex items-center justify-between">
+              <span className="text-[13px] text-muted">{LABELS[a.name] ?? a.name}</span>
+              <span className="mono text-[13px] tnum text-fg">{chipValue(a)}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
