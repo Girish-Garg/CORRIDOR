@@ -11,7 +11,7 @@ export default function App() {
   const { events, result, running, totalMs, runId, start } = useScenarioStream()
 
   useEffect(() => {
-    start()
+    start("")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -20,7 +20,13 @@ export default function App() {
       <Header />
       <main className="mx-auto grid max-w-[1100px] grid-cols-1 gap-4 px-6 py-6 lg:grid-cols-[320px_1fr]">
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <ScenarioControls assumptions={result?.assumptions ?? []} loading={running} onRun={start} />
+          <ScenarioControls
+            assumptions={result?.assumptions ?? []}
+            scope={result?.scope}
+            routeMethod={result?.route_method}
+            loading={running}
+            onRun={start}
+          />
         </div>
 
         <div className="space-y-4">
@@ -58,7 +64,7 @@ export default function App() {
           )}
 
           {!result && (
-            <div className="panel meta p-8 text-center">{running ? "Computing…" : "Idle"}</div>
+            <div className="panel meta p-8 text-center">{running ? "Routing & computing…" : "Idle"}</div>
           )}
         </div>
       </main>

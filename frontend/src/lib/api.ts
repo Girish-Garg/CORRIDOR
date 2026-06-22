@@ -44,11 +44,21 @@ export type RiskAssessment = {
   as_of: string
 }
 
+export type ScenarioScope = {
+  id: string
+  title: string
+  corridor: string
+  buckets: string[]
+  keywords: string[]
+}
+
 export type RunResult = {
   outputs: ScenarioOutputs
   ranking: { options: RerouteOption[] }
   assumptions: Assumption[]
   risk?: RiskAssessment
+  scope?: ScenarioScope
+  route_method?: string
   total_ms?: number
 }
 

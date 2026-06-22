@@ -2,6 +2,7 @@ import asyncio
 import time
 
 from app import repo
+from app.router import route_scenario
 from app.domain.risk import compute_risk
 from app.domain.trace import TraceEvent
 from app.domain.types import ScenarioInputs
@@ -20,15 +21,14 @@ def _route(task: str) -> tuple[str, str]:
     return table.get(task, ("deterministic", "cached"))
 
 
-async def run_stream(overrides: dict[str, float]):
-    start = time.monotonic()
+async def run_stream(overrides: dict[str, float], query: str = ""):
     seq = {"n": 0}
 
-    def ev(agent, phase, message, provider="deterministic", mode="cached", sources=None):
+    def ev(base, agent, phase, message, provider="deterministic", mode="cached", sources=None):
         seq["n"] += 1
         return TraceEvent(
             seq=seq["n"],
-            t_ms=int((time.monotonic() - start) * 1000),
+            t_ms=int((time.monotonic() - base) * 1000),
             agent=agent,
             phase=phase,
             message=message,
@@ -37,45 +37,55 @@ async def run_stream(overrides: dict[str, float]):
             sources=sources or [],
         )
 
-    yield ("trace", ev("orchestrator", "start", "Spawning agent chain: Strait of Hormuz closure"))
-    await asyncio.sleep(0.35)
+    # Routing phase. The Claude CLI is slow to invoke, so this is timed and
+    # reported separately from the signal-to-recommendation pipeline below.
+    route_t0 = time.monotonic()
+    yield ("trace", ev(route_t0, "orchestrator", "start", "Interpreting scenario query with Claude", "claude", "live"))
+    scope, method = await asyncio.to_thread(route_scenario, query)
+    route_ms = int((time.monotonic() - route_t0) * 1000)
+    prov = "claude" if method == "claude" else "deterministic"
+    yield (
+        "trace",
+        ev(route_t0, "orchestrator", "retrieve", f"Routed to {scope['title']} via {method} ({route_ms / 1000:.1f}s)", prov, "live" if method == "claude" else "cached"),
+    )
 
-    yield ("trace", ev("risk", "retrieve", "Querying geopolitics, shipping, policy buckets", *_route("classify")))
-    signals = repo.retrieve_signals(["geopolitics", "shipping", "policy", "commodities"], 8)
-    await asyncio.sleep(0.35)
-    risk = compute_risk("Strait of Hormuz", signals, AS_OF)
+    # Signal-to-recommendation pipeline. Timer restarts here.
+    t0 = time.monotonic()
+    yield (
+        "trace",
+        ev(t0, "risk", "retrieve", f"Scoping retrieval to {', '.join(scope['buckets'])} for {scope['corridor']}", *_route("classify")),
+    )
+    signals = repo.retrieve_signals(scope["buckets"], scope["keywords"], 8)
+    await asyncio.sleep(0.3)
+    risk = compute_risk(scope["corridor"], signals, AS_OF)
     src = [s.source_doc_id for s in signals if s.source_doc_id]
     yield (
         "trace",
-        ev("risk", "done", f"Disruption probability {risk.score:.0%} from {len(signals)} signals", "ollama", "cached", src),
+        ev(t0, "risk", "done", f"Disruption probability {risk.score:.0%} from {len(signals)} scoped signals", "ollama", "cached", src),
     )
     await asyncio.sleep(0.3)
 
     values, listed = repo.load_assumption_values(overrides)
     inputs = ScenarioInputs(**{k: values[k] for k in ScenarioInputs.model_fields})
-    yield ("trace", ev("scenario", "compute", "Running deterministic impact model on editable assumptions", *_route("synthesize")))
+    yield ("trace", ev(t0, "scenario", "compute", "Running deterministic impact model on editable assumptions", *_route("synthesize")))
     outputs = run_scenario(inputs)
-    await asyncio.sleep(0.35)
+    await asyncio.sleep(0.3)
     yield (
         "trace",
-        ev(
-            "scenario",
-            "done",
-            f"Economic impact ${outputs.economic_impact_usd / 1e9:.2f}B, {outputs.barrels_at_risk_per_day:,.0f} bbl/day at risk",
-        ),
+        ev(t0, "scenario", "done", f"Economic impact ${outputs.economic_impact_usd / 1e9:.2f}B, {outputs.barrels_at_risk_per_day:,.0f} bbl/day at risk"),
     )
     await asyncio.sleep(0.3)
 
-    yield ("trace", ev("procurement", "retrieve", "Pulling candidate sources and routes from graph", *_route("rank")))
+    yield ("trace", ev(t0, "procurement", "retrieve", "Pulling candidate sources and routes from graph", *_route("rank")))
     options = score_options(repo.load_candidates(values["reroute_premium_usd"]))
-    await asyncio.sleep(0.35)
+    await asyncio.sleep(0.3)
     top = options[0]
     yield (
         "trace",
-        ev("procurement", "done", f"Ranked {len(options)} reroutes, top: {top.source} {top.grade} (score {top.composite_score:.2f})"),
+        ev(t0, "procurement", "done", f"Ranked {len(options)} reroutes, top: {top.source} {top.grade} (score {top.composite_score:.2f})"),
     )
 
-    total_ms = int((time.monotonic() - start) * 1000)
+    total_ms = int((time.monotonic() - t0) * 1000)
     yield (
         "result",
         {
@@ -83,6 +93,9 @@ async def run_stream(overrides: dict[str, float]):
             "ranking": {"options": [o.model_dump() for o in options]},
             "assumptions": listed,
             "risk": risk.model_dump(),
+            "scope": scope,
+            "route_method": method,
+            "route_ms": route_ms,
             "total_ms": total_ms,
         },
     )

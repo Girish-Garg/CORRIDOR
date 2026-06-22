@@ -1,6 +1,7 @@
-import { Assumption } from "../lib/api"
+import { Assumption, ScenarioScope } from "../lib/api"
 import { fmtPct, fmtMbbl } from "../lib/format"
 import { SectionLabel } from "./Section"
+import { ScenarioInput } from "./ScenarioInput"
 
 const SHOWN = ["hormuz_dependency", "reserve_days", "india_daily_imports_bbl", "baseline_brent_usd"]
 const LABELS: Record<string, string> = {
@@ -20,35 +21,37 @@ function chipValue(a: Assumption): string {
 
 export function ScenarioControls({
   assumptions,
+  scope,
+  routeMethod,
   loading,
   onRun,
 }: {
   assumptions: Assumption[]
+  scope?: ScenarioScope
+  routeMethod?: string
   loading: boolean
-  onRun: () => void
+  onRun: (text: string) => void
 }) {
   const chips = SHOWN.map((n) => assumptions.find((a) => a.name === n)).filter(Boolean) as Assumption[]
   return (
     <div className="panel p-5">
-      <SectionLabel n="1.0" title="Scenario" />
-      <h2 className="text-[22px] font-bold leading-tight tracking-tightest text-fg">
-        Strait of Hormuz, full closure
-      </h2>
-      <p className="mt-2 text-[13px] leading-relaxed text-muted">
-        Model the procurement shock if transit halts, and rank the crude reroutes that keep Indian
-        refineries supplied.
-      </p>
+      <SectionLabel n="1.0" title="Define scenario" />
+      <ScenarioInput loading={loading} onSubmit={onRun} />
 
-      <button
-        onClick={onRun}
-        disabled={loading}
-        className="mt-5 w-full rounded-md border border-line2 bg-surface2 px-4 py-2.5 text-[13px] font-semibold text-fg transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
-      >
-        {loading ? "Running model…" : "Run disruption model"}
-      </button>
+      {scope && (
+        <div className="mt-5 border-t border-line pt-4">
+          <SectionLabel
+            n="1.1"
+            title="Active scope"
+            right={routeMethod ? <span className="meta">routed via {routeMethod}</span> : undefined}
+          />
+          <div className="text-[15px] font-semibold tracking-tightest text-fg">{scope.title}</div>
+          <div className="mono mt-1 text-[11px] text-faint">corridor · {scope.corridor}</div>
+        </div>
+      )}
 
-      <div className="mt-6">
-        <SectionLabel n="1.1" title="Assumptions · editable · sourced" />
+      <div className="mt-5">
+        <SectionLabel n="1.2" title="Assumptions · editable · sourced" />
         <div className="space-y-2.5">
           {chips.length === 0 && <div className="mono text-[12px] text-faint">loading…</div>}
           {chips.map((a) => (

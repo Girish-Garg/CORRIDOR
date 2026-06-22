@@ -20,14 +20,16 @@ export function useScenarioStream() {
   const [runId, setRunId] = useState(0)
   const esRef = useRef<EventSource | null>(null)
 
-  function start() {
+  function start(query = "") {
     esRef.current?.close()
     setEvents([])
     setResult(null)
     setTotalMs(null)
     setRunning(true)
     setRunId((x) => x + 1)
-    const es = new EventSource("http://localhost:8000/scenario/stream")
+    const url =
+      "http://localhost:8000/scenario/stream" + (query ? `?q=${encodeURIComponent(query)}` : "")
+    const es = new EventSource(url)
     esRef.current = es
     es.addEventListener("trace", (e) => {
       setEvents((prev) => [...prev, JSON.parse((e as MessageEvent).data)])

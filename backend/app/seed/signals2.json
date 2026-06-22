@@ -1,0 +1,14 @@
+{
+  "documents": [
+    {"id": "doc-redsea", "title": "Red Sea and Bab-el-Mandeb shipping disruption", "url": "https://www.iea.org/topics/oil-security", "bucket": "shipping", "body": "Houthi attacks on commercial shipping in the Red Sea forced carriers to divert around the Cape of Good Hope, cutting Suez Canal transits and lengthening crude voyages to Asia."},
+    {"id": "doc-russia-sanctions", "title": "Sanctions tighten on Russian crude", "url": "https://www.eia.gov/petroleum/", "bucket": "policy", "body": "G7 price caps and sanctions on shadow-fleet tankers tightened access to discounted Russian crude, pressuring the Urals flows that India had leaned on."}
+  ],
+  "signals": [
+    {"id": "rs-1", "occurred_at": "2025-12-15", "bucket": "shipping", "headline": "Houthi attacks on Red Sea shipping intensify; carriers divert via Cape", "severity": 0.8, "source_doc_id": "doc-redsea"},
+    {"id": "rs-2", "occurred_at": "2025-12-22", "bucket": "geopolitics", "headline": "Bab-el-Mandeb transit risk rises as Yemen strikes continue", "severity": 0.72, "source_doc_id": "doc-redsea"},
+    {"id": "rs-3", "occurred_at": "2026-01-08", "bucket": "commodities", "headline": "Freight rates surge as Suez Canal crude transits fall sharply", "severity": 0.65, "source_doc_id": "doc-redsea"},
+    {"id": "ru-1", "occurred_at": "2026-01-18", "bucket": "policy", "headline": "New sanctions target shadow-fleet tankers carrying Russian crude", "severity": 0.78, "source_doc_id": "doc-russia-sanctions"},
+    {"id": "ru-2", "occurred_at": "2026-02-02", "bucket": "commodities", "headline": "Urals discount narrows as compliance pressure rises on buyers", "severity": 0.6, "source_doc_id": "doc-russia-sanctions"},
+    {"id": "ru-3", "occurred_at": "2026-02-12", "bucket": "geopolitics", "headline": "Secondary sanctions threat complicates India Russian crude purchases", "severity": 0.7, "source_doc_id": "doc-russia-sanctions"}
+  ]
+}
