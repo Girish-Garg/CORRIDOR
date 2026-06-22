@@ -1,0 +1,23 @@
+{
+  "documents": [
+    {"id": "doc-eia-india", "title": "India crude import overview", "url": "https://www.eia.gov/international/content/analysis/countries_long/India/pdf/India.pdf", "bucket": "commodities", "body": "India imports more than 88 percent of its crude oil. Total crude imports were about 4.55 million barrels per day in July 2025 (EIA Country Analysis Brief, PPAC monthly data)."},
+    {"id": "doc-hormuz", "title": "Strait of Hormuz dependency", "url": "https://www.iea.org/about/oil-security-and-emergency-response/strait-of-hormuz", "bucket": "geopolitics", "body": "A large share of India crude transits the Strait of Hormuz. Estimates range from about 30 to 45 percent depending on source and date."},
+    {"id": "doc-ceew-reserves", "title": "India strategic petroleum reserve cover", "url": "https://www.outlookbusiness.com/news/indias-strategic-oil-reserves-cover-only-9-10-days-of-crude-imports-report", "bucket": "policy", "body": "India strategic petroleum reserves cover only about 9 to 10 days of net crude imports (CEEW, June 2026). Dedicated storage at Visakhapatnam, Mangaluru, and Padur."}
+  ],
+  "assumptions": [
+    {"name": "india_daily_imports_bbl", "value": 4600000, "unit": "bbl/day", "source": "doc-eia-india", "rationale": "India total crude imports about 4.55 mbpd July 2025 (EIA, PPAC); 4.6M as recent round average"},
+    {"name": "hormuz_dependency", "value": 0.42, "unit": "fraction", "source": "doc-hormuz", "rationale": "Share of India crude via Hormuz, debated 0.30 to 0.45"},
+    {"name": "reserve_days", "value": 9.5, "unit": "days", "source": "doc-ceew-reserves", "rationale": "Strategic reserves cover about 9 to 10 days of net imports (CEEW, June 2026)"},
+    {"name": "baseline_brent_usd", "value": 80.0, "unit": "USD/bbl", "source": "doc-eia-india", "rationale": "Baseline Brent spot, refresh from live in later blocks"},
+    {"name": "closure_severity", "value": 1.0, "unit": "fraction", "source": "user-set", "rationale": "Scenario knob, fraction of Hormuz flow blocked"},
+    {"name": "closure_duration_days", "value": 30, "unit": "days", "source": "user-set", "rationale": "Scenario knob"},
+    {"name": "risk_premium_per_pct_blocked", "value": 0.5, "unit": "USD/bbl per percent", "source": "user-set", "rationale": "Modeling knob, price premium per percent of Hormuz flow blocked"},
+    {"name": "reroute_premium_usd", "value": 4.0, "unit": "USD/bbl", "source": "user-set", "rationale": "Modeling knob, spot and rerouting premium"}
+  ],
+  "reroute_candidates": [
+    {"id": "c-urals-cape", "source": "Russia", "grade": "Urals", "route": "Baltic via Cape", "avoids_hormuz": true, "source_price_usd_bbl": 70.0, "freight_usd_bbl": 6.0, "tanker_availability": 0.7, "grade_fit": 0.9, "days_to_refinery": 30, "available_volume_bbl": 1200000, "source_doc_id": "doc-eia-india"},
+    {"id": "c-wti-cape", "source": "USA", "grade": "WTI Midland", "route": "US Gulf via Cape", "avoids_hormuz": true, "source_price_usd_bbl": 82.0, "freight_usd_bbl": 9.0, "tanker_availability": 0.8, "grade_fit": 0.6, "days_to_refinery": 40, "available_volume_bbl": 900000, "source_doc_id": "doc-eia-india"},
+    {"id": "c-bonny-cape", "source": "Nigeria", "grade": "Bonny Light", "route": "West Africa via Cape", "avoids_hormuz": true, "source_price_usd_bbl": 83.0, "freight_usd_bbl": 7.0, "tanker_availability": 0.6, "grade_fit": 0.65, "days_to_refinery": 28, "available_volume_bbl": 700000, "source_doc_id": "doc-eia-india"},
+    {"id": "c-espo-pacific", "source": "Russia", "grade": "ESPO", "route": "Kozmino direct", "avoids_hormuz": true, "source_price_usd_bbl": 75.0, "freight_usd_bbl": 5.0, "tanker_availability": 0.65, "grade_fit": 0.75, "days_to_refinery": 16, "available_volume_bbl": 600000, "source_doc_id": "doc-eia-india"}
+  ]
+}
