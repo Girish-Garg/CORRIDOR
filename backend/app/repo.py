@@ -15,17 +15,18 @@ def load_assumption_values(overrides: dict[str, float]) -> tuple[dict, list[dict
     return values, listed
 
 
-def load_candidates(reroute_premium: float) -> list[RerouteOption]:
+def load_candidates(reroute_premium: float, scope: str = "hormuz") -> list[RerouteOption]:
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute(
-            "SELECT id, source, grade, route, avoids_hormuz, source_price_usd_bbl, freight_usd_bbl, tanker_availability, grade_fit, days_to_refinery, available_volume_bbl, source_doc_id FROM reroute_candidates"
+            "SELECT id, source, grade, route, avoids_label, source_price_usd_bbl, freight_usd_bbl, tanker_availability, grade_fit, days_to_refinery, available_volume_bbl, source_doc_id FROM reroute_candidates WHERE scope = %s",
+            (scope,),
         )
         rows = cur.fetchall()
     out = []
     for r in rows:
         out.append(
             RerouteOption(
-                id=r[0], source=r[1], grade=r[2], route=r[3], avoids_hormuz=r[4],
+                id=r[0], source=r[1], grade=r[2], route=r[3], avoids_label=r[4],
                 landed_price_usd_bbl=r[5] + r[6] + reroute_premium,
                 tanker_availability=r[7], grade_fit=r[8], days_to_refinery=r[9],
                 available_volume_bbl=r[10], composite_score=0.0, source_doc_id=r[11],

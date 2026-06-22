@@ -17,12 +17,14 @@ CREATE TABLE IF NOT EXISTS assumptions (
   rationale TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS reroute_candidates (
+DROP TABLE IF EXISTS reroute_candidates;
+CREATE TABLE reroute_candidates (
   id TEXT PRIMARY KEY,
+  scope TEXT NOT NULL,
   source TEXT NOT NULL,
   grade TEXT NOT NULL,
   route TEXT NOT NULL,
-  avoids_hormuz BOOLEAN NOT NULL,
+  avoids_label TEXT NOT NULL,
   source_price_usd_bbl DOUBLE PRECISION NOT NULL,
   freight_usd_bbl DOUBLE PRECISION NOT NULL,
   tanker_availability DOUBLE PRECISION NOT NULL,

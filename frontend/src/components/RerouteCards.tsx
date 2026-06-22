@@ -30,9 +30,9 @@ function Row({ o, rank }: { o: RerouteOption; rank: number }) {
         <div className="flex flex-wrap items-baseline gap-2">
           <span className="text-[16px] font-semibold tracking-tight text-fg">{o.source}</span>
           <span className="mono text-[13px] text-muted">{o.grade}</span>
-          {o.avoids_hormuz && (
+          {o.avoids_label && (
             <span className="mono rounded border border-line2 px-1.5 py-0.5 text-[11px] text-faint">
-              avoids Hormuz
+              {o.avoids_label}
             </span>
           )}
         </div>

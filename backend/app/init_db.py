@@ -37,8 +37,8 @@ def init_db():
         for c in data["reroute_candidates"]:
             cur.execute(
                 """INSERT INTO reroute_candidates
-                (id, source, grade, route, avoids_hormuz, source_price_usd_bbl, freight_usd_bbl, tanker_availability, grade_fit, days_to_refinery, available_volume_bbl, source_doc_id)
-                VALUES (%(id)s, %(source)s, %(grade)s, %(route)s, %(avoids_hormuz)s, %(source_price_usd_bbl)s, %(freight_usd_bbl)s, %(tanker_availability)s, %(grade_fit)s, %(days_to_refinery)s, %(available_volume_bbl)s, %(source_doc_id)s)
+                (id, scope, source, grade, route, avoids_label, source_price_usd_bbl, freight_usd_bbl, tanker_availability, grade_fit, days_to_refinery, available_volume_bbl, source_doc_id)
+                VALUES (%(id)s, %(scope)s, %(source)s, %(grade)s, %(route)s, %(avoids_label)s, %(source_price_usd_bbl)s, %(freight_usd_bbl)s, %(tanker_availability)s, %(grade_fit)s, %(days_to_refinery)s, %(available_volume_bbl)s, %(source_doc_id)s)
                 ON CONFLICT (id) DO NOTHING""",
                 c,
             )

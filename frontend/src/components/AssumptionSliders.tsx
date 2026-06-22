@@ -4,7 +4,7 @@ import { SectionLabel } from "./Section"
 
 const FIELDS = [
   { name: "closure_severity", label: "Closure severity", min: 0, max: 1, step: 0.05, fmt: (v: number) => `${Math.round(v * 100)}%` },
-  { name: "hormuz_dependency", label: "Hormuz dependency", min: 0.2, max: 0.6, step: 0.01, fmt: (v: number) => `${Math.round(v * 100)}%` },
+  { name: "hormuz_dependency", label: "Corridor exposure", min: 0.05, max: 0.6, step: 0.01, fmt: (v: number) => `${Math.round(v * 100)}%` },
   { name: "risk_premium_per_pct_blocked", label: "Risk premium per %", min: 0, max: 1.5, step: 0.05, fmt: (v: number) => `$${v.toFixed(2)}` },
   { name: "reroute_premium_usd", label: "Reroute premium", min: 0, max: 12, step: 0.5, fmt: (v: number) => `$${v.toFixed(1)}` },
   { name: "closure_duration_days", label: "Closure duration", min: 5, max: 90, step: 5, fmt: (v: number) => `${v}d` },

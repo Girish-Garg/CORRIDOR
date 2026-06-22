@@ -11,7 +11,7 @@ export type RerouteOption = {
   source: string
   grade: string
   route: string
-  avoids_hormuz: boolean
+  avoids_label: string
   landed_price_usd_bbl: number
   tanker_availability: number
   grade_fit: number
@@ -62,11 +62,14 @@ export type RunResult = {
   total_ms?: number
 }
 
-export async function runScenario(overrides: Record<string, number> = {}): Promise<RunResult> {
+export async function runScenario(
+  overrides: Record<string, number> = {},
+  scope = "hormuz",
+): Promise<RunResult> {
   const res = await fetch("http://localhost:8000/scenario/run", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ overrides }),
+    body: JSON.stringify({ overrides, scope }),
   })
   if (!res.ok) throw new Error("scenario run failed")
   return res.json()

@@ -48,7 +48,7 @@ export default function App() {
 
   async function recompute(overrides: Record<string, number>) {
     try {
-      const r = await runScenario(overrides)
+      const r = await runScenario(overrides, result?.scope?.id ?? "hormuz")
       setResult((prev) =>
         prev ? { ...prev, outputs: r.outputs, ranking: r.ranking, assumptions: r.assumptions } : prev,
       )

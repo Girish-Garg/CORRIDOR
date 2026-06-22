@@ -66,6 +66,11 @@ async def run_stream(overrides: dict[str, float], query: str = ""):
     await asyncio.sleep(0.3)
 
     values, listed = repo.load_assumption_values(overrides)
+    values["hormuz_dependency"] = scope["dependency"]
+    for a in listed:
+        if a["name"] == "hormuz_dependency":
+            a["value"] = scope["dependency"]
+            a["rationale"] = f"Share of India crude exposed via {scope['corridor']}"
     inputs = ScenarioInputs(**{k: values[k] for k in ScenarioInputs.model_fields})
     yield ("trace", ev(t0, "scenario", "compute", "Running deterministic impact model on editable assumptions", *_route("synthesize")))
     outputs = run_scenario(inputs)
@@ -77,7 +82,7 @@ async def run_stream(overrides: dict[str, float], query: str = ""):
     await asyncio.sleep(0.3)
 
     yield ("trace", ev(t0, "procurement", "retrieve", "Pulling candidate sources and routes from graph", *_route("rank")))
-    options = score_options(repo.load_candidates(values["reroute_premium_usd"]))
+    options = score_options(repo.load_candidates(values["reroute_premium_usd"], scope["id"]))
     await asyncio.sleep(0.3)
     top = options[0]
     yield (

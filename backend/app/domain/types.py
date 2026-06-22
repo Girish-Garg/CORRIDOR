@@ -25,7 +25,7 @@ class RerouteOption(BaseModel):
     source: str
     grade: str
     route: str
-    avoids_hormuz: bool
+    avoids_label: str
     landed_price_usd_bbl: float
     tanker_availability: float
     grade_fit: float
