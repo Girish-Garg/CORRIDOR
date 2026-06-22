@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.init_db import init_db
+from app.api.scenario_routes import router as scenario_router
 
 app = FastAPI(title="CORRIDOR")
 
@@ -11,6 +12,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(scenario_router)
 
 
 @app.on_event("startup")
