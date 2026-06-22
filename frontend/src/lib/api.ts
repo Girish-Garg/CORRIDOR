@@ -11,14 +11,28 @@ export type RerouteOption = {
   source: string
   grade: string
   route: string
+  avoids_hormuz: boolean
   landed_price_usd_bbl: number
+  tanker_availability: number
+  grade_fit: number
   days_to_refinery: number
+  available_volume_bbl: number
   composite_score: number
+  source_doc_id: string | null
+}
+
+export type Assumption = {
+  name: string
+  value: number
+  unit: string
+  source: string
+  rationale: string
 }
 
 export type RunResult = {
   outputs: ScenarioOutputs
   ranking: { options: RerouteOption[] }
+  assumptions: Assumption[]
 }
 
 export async function runScenario(overrides: Record<string, number> = {}): Promise<RunResult> {
