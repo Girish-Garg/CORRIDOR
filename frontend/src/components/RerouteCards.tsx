@@ -4,7 +4,7 @@ import { SectionLabel } from "./Section"
 
 export function RerouteCards({ options, runKey }: { options: RerouteOption[]; runKey: number }) {
   return (
-    <div className="panel p-5">
+    <div className="panel p-6">
       <SectionLabel
         n="4.0"
         title="Recommended reroutes"
@@ -22,21 +22,21 @@ export function RerouteCards({ options, runKey }: { options: RerouteOption[]; ru
 function Row({ o, rank }: { o: RerouteOption; rank: number }) {
   const top = rank === 1
   return (
-    <div className="grid grid-cols-[26px_1fr_auto] items-center gap-4 py-3.5">
-      <span className={`mono text-[14px] tnum ${top ? "text-accent" : "text-faint"}`}>
+    <div className="grid grid-cols-[32px_1fr_auto] items-center gap-4 py-4">
+      <span className={`mono text-[18px] tnum ${top ? "text-accent" : "text-faint"}`}>
         {String(rank).padStart(2, "0")}
       </span>
       <div className="min-w-0">
         <div className="flex flex-wrap items-baseline gap-2">
-          <span className="text-[14px] font-semibold tracking-tight text-fg">{o.source}</span>
-          <span className="mono text-[12px] text-muted">{o.grade}</span>
+          <span className="text-[16px] font-semibold tracking-tight text-fg">{o.source}</span>
+          <span className="mono text-[13px] text-muted">{o.grade}</span>
           {o.avoids_hormuz && (
-            <span className="mono rounded border border-line2 px-1.5 py-px text-[10px] text-faint">
+            <span className="mono rounded border border-line2 px-1.5 py-0.5 text-[11px] text-faint">
               avoids Hormuz
             </span>
           )}
         </div>
-        <div className="mono mt-1.5 flex flex-wrap gap-x-4 gap-y-0.5 text-[11px] tnum text-faint">
+        <div className="mono mt-2 flex flex-wrap gap-x-5 gap-y-1 text-[13px] tnum text-faint">
           <span>{o.route}</span>
           <span>landed ${o.landed_price_usd_bbl.toFixed(1)}</span>
           <span>{o.days_to_refinery}d</span>
@@ -44,9 +44,9 @@ function Row({ o, rank }: { o: RerouteOption; rank: number }) {
           <span>tanker {fmtPct(o.tanker_availability)}</span>
         </div>
       </div>
-      <div className="w-24 text-right">
-        <div className="mono text-[15px] font-medium tnum text-fg">{o.composite_score.toFixed(2)}</div>
-        <div className="mt-1.5 h-[3px] w-full overflow-hidden rounded-full bg-line">
+      <div className="w-28 text-right">
+        <div className="mono text-[18px] font-medium tnum text-fg">{o.composite_score.toFixed(2)}</div>
+        <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-line">
           <div
             className={`gauge h-full ${top ? "bg-accent" : "bg-faint"}`}
             style={{ width: `${Math.round(o.composite_score * 100)}%` }}

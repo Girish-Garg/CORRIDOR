@@ -49,5 +49,5 @@ export function useScenarioStream() {
     }
   }
 
-  return { events, result, running, totalMs, runId, start }
+  return { events, result, running, totalMs, runId, start, setResult }
 }

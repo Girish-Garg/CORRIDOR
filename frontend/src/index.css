@@ -52,7 +52,7 @@ body {
   font-family: "IBM Plex Mono", monospace;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1;
   color: #6b6b71;
 }
@@ -61,6 +61,13 @@ body {
   background: #111013;
   border: 1px solid #232227;
   border-radius: 6px;
+}
+
+.corridor-map .leaflet-container {
+  background: #0a0a0b;
+}
+.corridor-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.92) contrast(0.9) saturate(0.7);
 }
 
 @keyframes fadeUp {

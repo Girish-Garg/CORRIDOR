@@ -1,78 +1,112 @@
-import { useEffect } from "react"
-import { Header } from "./components/Header"
-import { ScenarioControls } from "./components/ScenarioControls"
+import { useEffect, useState } from "react"
+import { runScenario, RiskAssessment } from "./lib/api"
+import { Sidebar } from "./components/Sidebar"
 import { ScenarioPanel } from "./components/ScenarioPanel"
 import { RerouteCards } from "./components/RerouteCards"
+import { CorridorMap } from "./components/CorridorMap"
+import { ReplayTimeline } from "./components/ReplayTimeline"
 import { AgentStream } from "./components/AgentStream"
 import { SectionLabel } from "./components/Section"
 import { useScenarioStream } from "./hooks/useEventStream"
 
+function Clock() {
+  const [t, setT] = useState(() => new Date().toISOString().slice(11, 19))
+  useEffect(() => {
+    const id = setInterval(() => setT(new Date().toISOString().slice(11, 19)), 1000)
+    return () => clearInterval(id)
+  }, [])
+  return <span className="mono text-[13px] tnum text-faint">{t} UTC</span>
+}
+
+function DisruptionBand({ risk }: { risk: RiskAssessment }) {
+  return (
+    <div className="panel p-6">
+      <SectionLabel
+        n="2.1"
+        title={`Disruption probability · ${risk.corridor}`}
+        right={<span className="meta">{risk.signals.length} signals</span>}
+      />
+      <div className="flex items-end gap-5">
+        <div className="mono text-[52px] font-semibold leading-none tnum text-accent">
+          {Math.round(risk.score * 100)}%
+        </div>
+        <div className="mb-2.5 h-2 flex-1 overflow-hidden rounded-full bg-line">
+          <div className="gauge h-full bg-accent" style={{ width: `${Math.round(risk.score * 100)}%` }} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
-  const { events, result, running, totalMs, runId, start } = useScenarioStream()
+  const { events, result, running, totalMs, runId, start, setResult } = useScenarioStream()
 
   useEffect(() => {
     start("")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  async function recompute(overrides: Record<string, number>) {
+    try {
+      const r = await runScenario(overrides)
+      setResult((prev) =>
+        prev ? { ...prev, outputs: r.outputs, ranking: r.ranking, assumptions: r.assumptions } : prev,
+      )
+    } catch {
+      // keep last good result
+    }
+  }
+
+  const scopeId = result?.scope?.id ?? "hormuz"
+
   return (
-    <div className="min-h-full">
-      <Header />
-      <main className="mx-auto grid max-w-[1100px] grid-cols-1 gap-4 px-6 py-6 lg:grid-cols-[320px_1fr]">
-        <div className="lg:sticky lg:top-6 lg:self-start">
-          <ScenarioControls
-            assumptions={result?.assumptions ?? []}
-            scope={result?.scope}
-            routeMethod={result?.route_method}
-            loading={running}
-            onRun={start}
-          />
+    <div className="flex min-h-screen">
+      <Sidebar
+        scope={result?.scope}
+        routeMethod={result?.route_method}
+        assumptions={result?.assumptions ?? []}
+        loading={running}
+        onRun={start}
+        onTune={recompute}
+      />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex items-center justify-between border-b border-line px-7 py-4">
+          <span className="meta">Theatre · Indian crude procurement</span>
+          <div className="flex items-center gap-6">
+            <Clock />
+            <span className="flex items-center gap-2">
+              <span className="h-2 w-2 rounded-full bg-accent" />
+              <span className="meta">Live monitoring</span>
+            </span>
+          </div>
         </div>
-
-        <div className="space-y-4">
-          <AgentStream events={events} totalMs={totalMs} running={running} />
-
+        <main className="grid flex-1 grid-cols-1 content-start gap-5 p-7 xl:grid-cols-2">
+          <div className="xl:col-span-2">
+            <AgentStream events={events} totalMs={totalMs} running={running} />
+          </div>
           {result && (
-            <div className="reveal space-y-4" key={runId}>
-              {result.risk && (
-                <div style={{ animationDelay: "0.02s" }} className="panel p-5">
-                  <SectionLabel
-                    n="2.1"
-                    title={`Disruption probability · ${result.risk.corridor}`}
-                    right={<span className="meta">{result.risk.signals.length} signals</span>}
-                  />
-                  <div className="flex items-end gap-4">
-                    <div className="mono text-[40px] font-semibold leading-none tnum text-accent">
-                      {Math.round(result.risk.score * 100)}%
-                    </div>
-                    <div className="mb-1.5 h-1.5 flex-1 overflow-hidden rounded-full bg-line">
-                      <div
-                        className="gauge h-full bg-accent"
-                        style={{ width: `${Math.round(result.risk.score * 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-              <div style={{ animationDelay: "0.06s" }}>
-                <ScenarioPanel o={result.outputs} runKey={runId} />
+            <>
+              {result.risk && <DisruptionBand risk={result.risk} />}
+              <ScenarioPanel o={result.outputs} runKey={runId} />
+              <CorridorMap scopeId={scopeId} />
+              <RerouteCards options={result.ranking.options} runKey={runId} />
+              <div className="xl:col-span-2">
+                <ReplayTimeline scopeId={scopeId} />
               </div>
-              <div style={{ animationDelay: "0.1s" }}>
-                <RerouteCards options={result.ranking.options} runKey={runId} />
-              </div>
+            </>
+          )}
+          {!result && (
+            <div className="panel meta p-10 text-center xl:col-span-2">
+              {running ? "Routing & computing…" : "Idle"}
             </div>
           )}
-
-          {!result && (
-            <div className="panel meta p-8 text-center">{running ? "Routing & computing…" : "Idle"}</div>
-          )}
-        </div>
-      </main>
-      <footer className="mx-auto max-w-[1100px] px-6 pb-8">
-        <div className="meta">
-          Sourced from EIA · IEA · CEEW · Deterministic engine, no model-invented numbers
-        </div>
-      </footer>
+        </main>
+        <footer className="border-t border-line px-7 py-4">
+          <div className="meta">
+            Sourced from EIA · IEA · CEEW · Deterministic engine, no model-invented numbers
+          </div>
+        </footer>
+      </div>
     </div>
   )
 }
