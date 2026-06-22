@@ -49,4 +49,17 @@ export const MAP_DATA: Record<string, MapData> = {
     ],
     vessels: [[58, 25], [40, 0], [22, 68]],
   },
+  opec: {
+    center: [18, 30],
+    zoom: 2,
+    chokepoint: { name: "OPEC+ Gulf loadings", lat: 26, lng: 50 },
+    hub: INDIA,
+    routes: [
+      { label: "US Gulf via Cape", avoidsDisruption: true, coords: [[29, -94], [10, -30], [-34.35, 18.47], [-5, 55], [22.4, 69.8]] },
+      { label: "Brazil via Atlantic and Cape", avoidsDisruption: true, coords: [[-23, -42], [-34.35, 18.47], [-5, 55], [22.4, 69.8]] },
+      { label: "Guyana via Atlantic and Cape", avoidsDisruption: true, coords: [[8, -58], [-15, -10], [-34.35, 18.47], [22.4, 69.8]] },
+      { label: "OPEC+ Gulf supply, cut", avoidsDisruption: false, coords: [[26, 50], [24, 60], [22.4, 69.8]] },
+    ],
+    vessels: [[26, 52], [20, 64], [0, -20]],
+  },
 }

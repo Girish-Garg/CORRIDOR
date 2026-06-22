@@ -4,6 +4,28 @@ export type ScenarioOutputs = {
   price_impact_usd_bbl: number
   price_delta_usd_bbl: number
   economic_impact_usd: number
+  pump_price_inr_per_l: number
+  pump_price_delta_inr_per_l: number
+  gdp_drag_pct: number
+}
+
+export type SprDay = {
+  day: number
+  gap_bbl: number
+  reroute_bbl: number
+  drawdown_bbl: number
+  remaining_pct: number
+}
+
+export type SprPlan = {
+  spr_total_bbl: number
+  daily_drawdown_bbl: number
+  days_to_exhaustion: number
+  covered_days: number
+  refinery_run_cut_pct: number
+  replenishment_days: number
+  reroute_ramp_days: number
+  schedule: SprDay[]
 }
 
 export type RerouteOption = {
@@ -55,6 +77,7 @@ export type ScenarioScope = {
 export type RunResult = {
   outputs: ScenarioOutputs
   ranking: { options: RerouteOption[] }
+  spr?: SprPlan
   assumptions: Assumption[]
   risk?: RiskAssessment
   scope?: ScenarioScope

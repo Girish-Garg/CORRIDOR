@@ -1,15 +1,22 @@
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts"
-import { REPLAY } from "../data/prices"
+import { REPLAY, leadTimeDays } from "../data/prices"
 import { SectionLabel } from "./Section"
 
 export function ReplayTimeline({ scopeId }: { scopeId: string }) {
   const data = REPLAY[scopeId] ?? REPLAY.hormuz
   const firstSignal = data.find((d) => d.event)
   const peak = data.reduce((a, b) => (b.brent > a.brent ? b : a), data[0])
+  const lead = leadTimeDays(data)
 
   return (
     <div className="panel p-5">
-      <SectionLabel title="Historical replay" right={<span className="meta">lead time</span>} />
+      <SectionLabel title="Historical replay" right={<span className="meta">signal lead time</span>} />
+      {lead != null && (
+        <div className="mb-4 flex items-end gap-3">
+          <span className="mono text-[44px] font-semibold leading-none tnum text-accent">{lead}d</span>
+          <span className="meta mb-1.5">flagged before Brent peaked</span>
+        </div>
+      )}
       <div style={{ height: 200 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 6, left: -20, bottom: 0 }}>
@@ -35,7 +42,8 @@ export function ReplayTimeline({ scopeId }: { scopeId: string }) {
       </div>
       {firstSignal && (
         <p className="mt-3 text-[12px] leading-relaxed text-muted">
-          Score crossed threshold on {firstSignal.date} ({firstSignal.event}), ahead of Brent peaking at ${peak.brent} on {peak.date}.
+          Score crossed threshold on {firstSignal.date} ({firstSignal.event})
+          {lead != null ? `, ${lead} days` : ""} before Brent peaked at ${peak.brent} on {peak.date}.
         </p>
       )}
     </div>

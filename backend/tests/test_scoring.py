@@ -4,7 +4,7 @@ from app.domain.scoring import score_options
 
 def _opt(name, price, tanker, grade, days):
     return RerouteOption(
-        id=name, source=name, grade=name, route="Cape", avoids_hormuz=True,
+        id=name, source=name, grade=name, route="Cape", avoids_label="avoids Hormuz",
         landed_price_usd_bbl=price, tanker_availability=tanker, grade_fit=grade,
         days_to_refinery=days, available_volume_bbl=1_000_000, composite_score=0.0,
     )

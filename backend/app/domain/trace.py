@@ -5,7 +5,7 @@ from typing import Literal
 class TraceEvent(BaseModel):
     seq: int
     t_ms: int
-    agent: Literal["orchestrator", "risk", "scenario", "procurement"]
+    agent: Literal["orchestrator", "risk", "scenario", "procurement", "reserve"]
     phase: Literal["start", "retrieve", "compute", "done"]
     message: str
     provider: str = "deterministic"

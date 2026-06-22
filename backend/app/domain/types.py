@@ -18,6 +18,29 @@ class ScenarioOutputs(BaseModel):
     price_impact_usd_bbl: float
     price_delta_usd_bbl: float
     economic_impact_usd: float
+    # Downstream cascades (each from an explicit, editable formula).
+    pump_price_inr_per_l: float
+    pump_price_delta_inr_per_l: float
+    gdp_drag_pct: float
+
+
+class SprDay(BaseModel):
+    day: int
+    gap_bbl: float
+    reroute_bbl: float
+    drawdown_bbl: float
+    remaining_pct: float
+
+
+class SprPlan(BaseModel):
+    spr_total_bbl: float
+    daily_drawdown_bbl: float
+    days_to_exhaustion: float
+    covered_days: float
+    refinery_run_cut_pct: float
+    replenishment_days: float
+    reroute_ramp_days: float
+    schedule: list[SprDay]
 
 
 class RerouteOption(BaseModel):

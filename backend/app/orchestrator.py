@@ -8,6 +8,7 @@ from app.domain.trace import TraceEvent
 from app.domain.types import ScenarioInputs
 from app.domain.scenario import run_scenario
 from app.domain.scoring import score_options
+from app.domain.spr import compute_spr_plan
 
 AS_OF = "2026-06-22"
 
@@ -89,6 +90,14 @@ async def run_stream(overrides: dict[str, float], query: str = ""):
         "trace",
         ev(t0, "procurement", "done", f"Ranked {len(options)} reroutes, top: {top.source} {top.grade} (score {top.composite_score:.2f})"),
     )
+    await asyncio.sleep(0.3)
+
+    yield ("trace", ev(t0, "reserve", "compute", "Scheduling SPR drawdown against the supply gap", *_route("rank")))
+    spr = compute_spr_plan(inputs, outputs.barrels_at_risk_per_day)
+    yield (
+        "trace",
+        ev(t0, "reserve", "done", f"Draw {spr.daily_drawdown_bbl / 1e3:,.0f}k bbl/day, reserve holds {spr.days_to_exhaustion:.0f} days, refill {spr.replenishment_days:.0f} days"),
+    )
 
     total_ms = int((time.monotonic() - t0) * 1000)
     yield (
@@ -96,6 +105,7 @@ async def run_stream(overrides: dict[str, float], query: str = ""):
         {
             "outputs": outputs.model_dump(),
             "ranking": {"options": [o.model_dump() for o in options]},
+            "spr": spr.model_dump(),
             "assumptions": listed,
             "risk": risk.model_dump(),
             "scope": scope,

@@ -6,8 +6,20 @@ import { RerouteCards } from "./components/RerouteCards"
 import { CorridorMap } from "./components/CorridorMap"
 import { ReplayTimeline } from "./components/ReplayTimeline"
 import { AgentStream } from "./components/AgentStream"
+import { SignalTicker } from "./components/SignalTicker"
+import { SprPanel } from "./components/SprPanel"
+import { ConnectionsGraph } from "./components/ConnectionsGraph"
 import { SectionLabel } from "./components/Section"
 import { useScenarioStream } from "./hooks/useEventStream"
+
+const TABS = [
+  { id: "risk", label: "Risk & signals" },
+  { id: "impact", label: "Impact & reserve" },
+  { id: "procurement", label: "Procurement" },
+  { id: "map", label: "Geospatial" },
+] as const
+
+type TabId = (typeof TABS)[number]["id"]
 
 function Clock() {
   const [t, setT] = useState(() => new Date().toISOString().slice(11, 19))
@@ -39,17 +51,24 @@ function DisruptionBand({ risk }: { risk: RiskAssessment }) {
 
 export default function App() {
   const { events, result, running, totalMs, runId, start, setResult } = useScenarioStream()
+  const [tab, setTab] = useState<TabId>("risk")
+  const [navOpen, setNavOpen] = useState(false)
 
   useEffect(() => {
     start("")
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  function runAndClose(text: string) {
+    setNavOpen(false)
+    start(text)
+  }
+
   async function recompute(overrides: Record<string, number>) {
     try {
       const r = await runScenario(overrides, result?.scope?.id ?? "hormuz")
       setResult((prev) =>
-        prev ? { ...prev, outputs: r.outputs, ranking: r.ranking, assumptions: r.assumptions } : prev,
+        prev ? { ...prev, outputs: r.outputs, ranking: r.ranking, spr: r.spr, assumptions: r.assumptions } : prev,
       )
     } catch {
       // keep last good result
@@ -64,32 +83,89 @@ export default function App() {
         scope={result?.scope}
         assumptions={result?.assumptions ?? []}
         loading={running}
-        onRun={start}
+        onRun={runAndClose}
         onTune={recompute}
+        open={navOpen}
+        onClose={() => setNavOpen(false)}
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="flex items-center justify-between border-b border-line px-7 py-4">
-          <span className="meta">Indian crude procurement</span>
+        <div className="flex items-center justify-between border-b border-line px-5 py-4 sm:px-7">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setNavOpen(true)}
+              aria-label="Open controls"
+              className="-ml-1 p-1 text-muted hover:text-fg lg:hidden"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" />
+              </svg>
+            </button>
+            <span className="text-[15px] font-semibold tracking-tightest text-fg lg:hidden">CORRIDOR</span>
+            <span className="meta hidden sm:inline">Indian crude procurement</span>
+          </div>
           <div className="flex items-center gap-6">
             <Clock />
             <span className="h-2 w-2 rounded-full bg-accent" />
           </div>
         </div>
-        <main className="flex flex-1 flex-col gap-5 p-7">
+        <main className="flex flex-1 flex-col gap-5 p-4 sm:p-7">
           <AgentStream events={events} totalMs={totalMs} running={running} />
           {result ? (
             <>
-              <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
-                <div className="flex min-w-0 flex-1 flex-col gap-5">
-                  {result.risk && <DisruptionBand risk={result.risk} />}
-                  <CorridorMap scopeId={scopeId} />
-                </div>
-                <div className="flex min-w-0 flex-1 flex-col gap-5">
-                  <ScenarioPanel o={result.outputs} runKey={runId} />
-                  <RerouteCards options={result.ranking.options} runKey={runId} />
-                </div>
+              <div className="flex gap-1 overflow-x-auto border-b border-line">
+                {TABS.map((t) => {
+                  const active = tab === t.id
+                  return (
+                    <button
+                      key={t.id}
+                      onClick={() => setTab(t.id)}
+                      className={`mono -mb-px shrink-0 whitespace-nowrap border-b-2 px-3 py-2.5 text-[12px] uppercase tracking-wide transition-colors sm:px-4 ${
+                        active ? "border-accent text-fg" : "border-transparent text-faint hover:text-muted"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  )
+                })}
               </div>
-              <ReplayTimeline scopeId={scopeId} />
+
+              {tab === "risk" && (
+                <div className="flex flex-col gap-5">
+                  {result.risk && <DisruptionBand risk={result.risk} />}
+                  <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
+                    {result.risk && (
+                      <div className="min-w-0 flex-1">
+                        <SignalTicker signals={result.risk.signals} />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <ReplayTimeline scopeId={scopeId} />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {tab === "impact" && (
+                <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
+                  <div className="min-w-0 flex-1">
+                    <ScenarioPanel o={result.outputs} runKey={runId} />
+                  </div>
+                  {result.spr && (
+                    <div className="min-w-0 flex-1">
+                      <SprPanel spr={result.spr} runKey={runId} />
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {tab === "procurement" && (
+                <div className="flex flex-col gap-5">
+                  <RerouteCards options={result.ranking.options} runKey={runId} />
+                  <ConnectionsGraph options={result.ranking.options} scope={result.scope} />
+                </div>
+              )}
+
+              {tab === "map" && <CorridorMap scopeId={scopeId} />}
             </>
           ) : (
             <div className="panel meta p-10 text-center">{running ? "Computing…" : "Idle"}</div>

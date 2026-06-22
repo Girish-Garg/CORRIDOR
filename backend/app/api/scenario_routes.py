@@ -6,6 +6,7 @@ from app.scopes import get_scope
 from app.domain.types import ScenarioInputs
 from app.domain.scenario import run_scenario
 from app.domain.scoring import score_options
+from app.domain.spr import compute_spr_plan
 
 router = APIRouter()
 
@@ -27,8 +28,10 @@ def run(req: RunRequest):
     inputs = ScenarioInputs(**{k: values[k] for k in ScenarioInputs.model_fields})
     outputs = run_scenario(inputs)
     options = score_options(repo.load_candidates(values["reroute_premium_usd"], scope["id"]))
+    spr = compute_spr_plan(inputs, outputs.barrels_at_risk_per_day)
     return {
         "outputs": outputs.model_dump(),
         "ranking": {"options": [o.model_dump() for o in options]},
+        "spr": spr.model_dump(),
         "assumptions": listed,
     }

@@ -23,6 +23,14 @@ SCOPES = {
         "buckets": ["policy", "commodities", "geopolitics"],
         "keywords": ["russia", "urals", "sanction", "shadow", "price cap"],
     },
+    "opec": {
+        "id": "opec",
+        "title": "OPEC+ emergency production cut",
+        "corridor": "OPEC+ supply",
+        "dependency": 0.55,
+        "buckets": ["policy", "commodities", "geopolitics"],
+        "keywords": ["opec", "production cut", "output cut", "quota", "supply cut"],
+    },
 }
 
 DEFAULT = "hormuz"

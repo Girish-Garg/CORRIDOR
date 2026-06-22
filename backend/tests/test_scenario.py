@@ -4,7 +4,9 @@ from app.domain.scenario import (
     barrels_at_risk_per_day,
     reserve_cover_days,
     price_impact_usd_bbl,
+    pump_price_delta_inr_per_l,
     run_scenario,
+    BASELINE_PUMP_INR_PER_L,
 )
 
 
@@ -43,3 +45,18 @@ def test_economic_impact_positive_and_scales_with_duration():
     short = run_scenario(_inputs(closure_duration_days=10))
     long = run_scenario(_inputs(closure_duration_days=30))
     assert long.economic_impact_usd > short.economic_impact_usd > 0
+
+
+def test_pump_price_rises_above_baseline_under_closure():
+    o = run_scenario(_inputs())
+    assert o.pump_price_delta_inr_per_l > 0
+    assert o.pump_price_inr_per_l == BASELINE_PUMP_INR_PER_L + o.pump_price_delta_inr_per_l
+
+
+def test_pump_delta_scales_with_price_delta():
+    assert pump_price_delta_inr_per_l(20.0) == 2 * pump_price_delta_inr_per_l(10.0)
+
+
+def test_gdp_drag_positive_and_zero_without_closure():
+    assert run_scenario(_inputs()).gdp_drag_pct > 0
+    assert run_scenario(_inputs(closure_severity=0.0)).gdp_drag_pct == 0.0

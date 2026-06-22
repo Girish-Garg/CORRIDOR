@@ -4,6 +4,7 @@ const PRESETS = [
   "Strait of Hormuz full closure",
   "Red Sea Houthi attacks disrupt Bab-el-Mandeb",
   "New sanctions tighten Russian crude supply",
+  "OPEC+ emergency production cut tightens supply",
 ]
 
 export function ScenarioInput({
