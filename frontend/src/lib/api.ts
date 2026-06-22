@@ -29,10 +29,27 @@ export type Assumption = {
   rationale: string
 }
 
+export type SignalRef = {
+  occurred_at: string
+  headline: string
+  severity: number
+  bucket: string
+  source_doc_id: string | null
+}
+
+export type RiskAssessment = {
+  corridor: string
+  score: number
+  signals: SignalRef[]
+  as_of: string
+}
+
 export type RunResult = {
   outputs: ScenarioOutputs
   ranking: { options: RerouteOption[] }
   assumptions: Assumption[]
+  risk?: RiskAssessment
+  total_ms?: number
 }
 
 export async function runScenario(overrides: Record<string, number> = {}): Promise<RunResult> {

@@ -31,3 +31,12 @@ CREATE TABLE IF NOT EXISTS reroute_candidates (
   available_volume_bbl DOUBLE PRECISION NOT NULL,
   source_doc_id TEXT REFERENCES documents(id)
 );
+
+CREATE TABLE IF NOT EXISTS signals (
+  id TEXT PRIMARY KEY,
+  occurred_at DATE NOT NULL,
+  bucket TEXT NOT NULL,
+  headline TEXT NOT NULL,
+  severity DOUBLE PRECISION NOT NULL,
+  source_doc_id TEXT REFERENCES documents(id)
+);

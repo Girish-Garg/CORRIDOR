@@ -4,6 +4,7 @@ from app.db import get_conn
 
 SCHEMA = Path(__file__).parent / "schema.sql"
 SEED = Path(__file__).parent / "seed" / "seed.json"
+SIGNALS = Path(__file__).parent / "seed" / "signals.json"
 
 
 def init_db():
@@ -27,4 +28,15 @@ def init_db():
                 VALUES (%(id)s, %(source)s, %(grade)s, %(route)s, %(avoids_hormuz)s, %(source_price_usd_bbl)s, %(freight_usd_bbl)s, %(tanker_availability)s, %(grade_fit)s, %(days_to_refinery)s, %(available_volume_bbl)s, %(source_doc_id)s)
                 ON CONFLICT (id) DO NOTHING""",
                 c,
+            )
+        sig = json.loads(SIGNALS.read_text())
+        for d in sig["documents"]:
+            cur.execute(
+                "INSERT INTO documents (id, title, url, bucket, body) VALUES (%(id)s, %(title)s, %(url)s, %(bucket)s, %(body)s) ON CONFLICT (id) DO NOTHING",
+                d,
+            )
+        for s in sig["signals"]:
+            cur.execute(
+                "INSERT INTO signals (id, occurred_at, bucket, headline, severity, source_doc_id) VALUES (%(id)s, %(occurred_at)s, %(bucket)s, %(headline)s, %(severity)s, %(source_doc_id)s) ON CONFLICT (id) DO NOTHING",
+                s,
             )

@@ -1,0 +1,14 @@
+{
+  "documents": [
+    {"id": "doc-hormuz-2026", "title": "2026 Strait of Hormuz crisis", "url": "https://en.wikipedia.org/wiki/2026_Strait_of_Hormuz_crisis", "bucket": "geopolitics", "body": "Following US-Israeli airstrikes on Iranian military and nuclear sites on 28 February 2026, Iran moved to disrupt traffic through the Strait of Hormuz, triggering the most serious closure of the chokepoint to date and forcing crude buyers onto alternative routes."},
+    {"id": "doc-brent-2026", "title": "Brent crude reaction during the 2026 Hormuz crisis", "url": "https://www.eia.gov/petroleum/", "bucket": "commodities", "body": "Analysts including Goldman Sachs warned that a blockade of the Strait of Hormuz could push Brent crude above 100 USD per barrel. Ocean freight spot rates rose sharply, up roughly 55 percent month over month during the escalation."}
+  ],
+  "signals": [
+    {"id": "sig-1", "occurred_at": "2026-02-28", "bucket": "geopolitics", "headline": "US-Israeli airstrikes hit Iranian military and nuclear sites", "severity": 0.85, "source_doc_id": "doc-hormuz-2026"},
+    {"id": "sig-2", "occurred_at": "2026-03-01", "bucket": "policy", "headline": "Iran signals intent to disrupt traffic through the Strait of Hormuz", "severity": 0.8, "source_doc_id": "doc-hormuz-2026"},
+    {"id": "sig-3", "occurred_at": "2026-03-02", "bucket": "shipping", "headline": "Tanker operators divert and pause Gulf transits; war-risk premiums spike", "severity": 0.75, "source_doc_id": "doc-hormuz-2026"},
+    {"id": "sig-4", "occurred_at": "2026-03-03", "bucket": "commodities", "headline": "Brent crude jumps toward 100 USD on closure fears", "severity": 0.7, "source_doc_id": "doc-brent-2026"},
+    {"id": "sig-5", "occurred_at": "2026-03-05", "bucket": "geopolitics", "headline": "Strait of Hormuz transit effectively halted for laden tankers", "severity": 0.95, "source_doc_id": "doc-hormuz-2026"},
+    {"id": "sig-6", "occurred_at": "2026-03-09", "bucket": "policy", "headline": "India draws on strategic reserves and seeks alternative crude cargoes", "severity": 0.6, "source_doc_id": "doc-hormuz-2026"}
+  ]
+}

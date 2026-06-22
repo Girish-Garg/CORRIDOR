@@ -1,32 +1,17 @@
-import { useEffect, useState } from "react"
-import { runScenario, RunResult } from "./lib/api"
+import { useEffect } from "react"
 import { Header } from "./components/Header"
 import { ScenarioControls } from "./components/ScenarioControls"
 import { ScenarioPanel } from "./components/ScenarioPanel"
 import { RerouteCards } from "./components/RerouteCards"
+import { AgentStream } from "./components/AgentStream"
+import { useScenarioStream } from "./hooks/useEventStream"
 
 export default function App() {
-  const [result, setResult] = useState<RunResult | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [runKey, setRunKey] = useState(0)
-
-  async function run() {
-    setLoading(true)
-    setError(null)
-    try {
-      const r = await runScenario()
-      setResult(r)
-      setRunKey((k) => k + 1)
-    } catch {
-      setError("Backend not reachable on port 8000")
-    } finally {
-      setLoading(false)
-    }
-  }
+  const { events, result, running, totalMs, runId, start } = useScenarioStream()
 
   useEffect(() => {
-    run()
+    start()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
@@ -34,27 +19,49 @@ export default function App() {
       <Header />
       <main className="mx-auto grid max-w-[1180px] grid-cols-1 gap-5 px-6 py-7 lg:grid-cols-[340px_1fr]">
         <div className="lg:sticky lg:top-7 lg:self-start">
-          <ScenarioControls assumptions={result?.assumptions ?? []} loading={loading} onRun={run} />
+          <ScenarioControls assumptions={result?.assumptions ?? []} loading={running} onRun={start} />
         </div>
 
-        <div className="reveal space-y-5" key={runKey}>
-          {error && (
-            <div className="tick panel mono border-risk/40 p-5 text-[13px] text-risk">
-              {error}. Start it with: docker compose up -d backend
+        <div className="space-y-5">
+          <AgentStream events={events} totalMs={totalMs} running={running} />
+
+          {result && (
+            <div className="reveal space-y-5" key={runId}>
+              {result.risk && (
+                <div
+                  style={{ animationDelay: "0.02s" }}
+                  className="tick panel flex items-center justify-between p-5"
+                >
+                  <div>
+                    <div className="label">Live disruption probability · {result.risk.corridor}</div>
+                    <div className="mono mt-2 text-[34px] font-bold tnum text-risk">
+                      {Math.round(result.risk.score * 100)}%
+                    </div>
+                  </div>
+                  <div className="w-44">
+                    <div className="h-2 w-full overflow-hidden bg-line">
+                      <div
+                        className="gauge-fill h-full bg-risk"
+                        style={{ width: `${Math.round(result.risk.score * 100)}%` }}
+                      />
+                    </div>
+                    <div className="label mt-2 text-right">{result.risk.signals.length} signals fused</div>
+                  </div>
+                </div>
+              )}
+              <div style={{ animationDelay: "0.06s" }}>
+                <ScenarioPanel o={result.outputs} runKey={runId} />
+              </div>
+              <div style={{ animationDelay: "0.16s" }}>
+                <RerouteCards options={result.ranking.options} runKey={runId} />
+              </div>
             </div>
           )}
-          {result && (
-            <>
-              <div style={{ animationDelay: "0.02s" }}>
-                <ScenarioPanel o={result.outputs} runKey={runKey} />
-              </div>
-              <div style={{ animationDelay: "0.12s" }}>
-                <RerouteCards options={result.ranking.options} runKey={runKey} />
-              </div>
-            </>
-          )}
-          {!result && !error && (
-            <div className="panel label p-10 text-center">Initializing model…</div>
+
+          {!result && (
+            <div className="panel label p-10 text-center">
+              {running ? "Agents are computing the reroute…" : "Idle"}
+            </div>
           )}
         </div>
       </main>
