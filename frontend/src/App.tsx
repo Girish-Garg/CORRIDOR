@@ -80,23 +80,24 @@ export default function App() {
             </span>
           </div>
         </div>
-        <main className="grid flex-1 grid-cols-1 content-start gap-5 p-7 xl:grid-cols-2">
-          <div className="xl:col-span-2">
-            <AgentStream events={events} totalMs={totalMs} running={running} />
-          </div>
-          {result && (
+        <main className="flex flex-1 flex-col gap-5 p-7">
+          <AgentStream events={events} totalMs={totalMs} running={running} />
+          {result ? (
             <>
-              {result.risk && <DisruptionBand risk={result.risk} />}
-              <ScenarioPanel o={result.outputs} runKey={runId} />
-              <CorridorMap scopeId={scopeId} />
-              <RerouteCards options={result.ranking.options} runKey={runId} />
-              <div className="xl:col-span-2">
-                <ReplayTimeline scopeId={scopeId} />
+              <div className="flex flex-col gap-5 xl:flex-row xl:items-start">
+                <div className="flex min-w-0 flex-1 flex-col gap-5">
+                  {result.risk && <DisruptionBand risk={result.risk} />}
+                  <CorridorMap scopeId={scopeId} />
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col gap-5">
+                  <ScenarioPanel o={result.outputs} runKey={runId} />
+                  <RerouteCards options={result.ranking.options} runKey={runId} />
+                </div>
               </div>
+              <ReplayTimeline scopeId={scopeId} />
             </>
-          )}
-          {!result && (
-            <div className="panel meta p-10 text-center xl:col-span-2">
+          ) : (
+            <div className="panel meta p-10 text-center">
               {running ? "Routing & computing…" : "Idle"}
             </div>
           )}
