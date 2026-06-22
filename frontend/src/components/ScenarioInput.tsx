@@ -31,16 +31,16 @@ export function ScenarioInput({
             submit(text)
           }
         }}
-        placeholder="Describe a disruption scenario, e.g. Red Sea Houthi attacks…"
+        placeholder="Describe a disruption…"
         rows={2}
-        className="w-full resize-none rounded-md border border-line2 bg-surface2 px-3 py-2 text-[13px] text-fg placeholder:text-faint focus:border-accent focus:outline-none"
+        className="w-full resize-none rounded-md border border-line2 bg-surface2 px-3 py-2 text-[14px] text-fg placeholder:text-faint focus:border-accent focus:outline-none"
       />
       <button
         onClick={() => submit(text)}
         disabled={loading}
-        className="mt-2 w-full rounded-md border border-line2 bg-surface2 px-4 py-2.5 text-[13px] font-semibold text-fg transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+        className="mt-2 w-full rounded-md border border-line2 bg-surface2 px-4 py-2.5 text-[14px] font-semibold text-fg transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
       >
-        {loading ? "Routing & running…" : "Route & run scenario"}
+        {loading ? "Running…" : "Run scenario"}
       </button>
       <div className="mt-3 flex flex-wrap gap-1.5">
         {PRESETS.map((p) => (
@@ -51,9 +51,9 @@ export function ScenarioInput({
               submit(p)
             }}
             disabled={loading}
-            className="mono rounded border border-line px-2 py-1 text-[10px] text-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
+            className="mono rounded border border-line px-2 py-1 text-[11px] text-muted transition-colors hover:border-accent hover:text-accent disabled:opacity-50"
           >
-            {p.split(" ").slice(0, 3).join(" ")}…
+            {p.split(" ").slice(0, 2).join(" ")}…
           </button>
         ))}
       </div>

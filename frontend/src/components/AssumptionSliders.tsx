@@ -37,7 +37,7 @@ export function AssumptionSliders({
 
   return (
     <div>
-      <SectionLabel n="1.2" title="Assumptions, drag to test" right={<span className="meta">live re-run</span>} />
+      <SectionLabel title="Assumptions" />
       <div className="space-y-4">
         {FIELDS.map((f) => {
           const v = vals[f.name] ?? f.min

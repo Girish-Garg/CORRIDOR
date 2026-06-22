@@ -11,14 +11,14 @@ export function ScenarioPanel({ o, runKey }: { o: ScenarioOutputs; runKey: numbe
 
   return (
     <div className="panel p-6">
-      <SectionLabel n="3.0" title="Projected impact" right={<span className="meta">Severity high</span>} />
+      <SectionLabel title="Projected impact" />
       <div className="mono text-[60px] font-semibold leading-none tnum text-fg">
         ${(econ / 1e9).toFixed(2)}B
       </div>
-      <div className="mt-3 text-[15px] text-muted">Additional procurement cost over the closure</div>
+      <div className="mt-2 text-[14px] text-muted">Added procurement cost over the closure</div>
 
       <div className="mt-6 grid grid-cols-3 border-t border-line">
-        <Readout label="Barrels at risk / day" value={fmtInt(barrels)} />
+        <Readout label="Barrels at risk" value={fmtInt(barrels)} />
         <Readout label="Reserve cover" value={`${fmtDays(cover)} d`} divider />
         <Readout label="Price impact" value={`${fmtUsd1(price)}/bbl`} divider />
       </div>

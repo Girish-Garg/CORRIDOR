@@ -9,7 +9,7 @@ export function ReplayTimeline({ scopeId }: { scopeId: string }) {
 
   return (
     <div className="panel p-5">
-      <SectionLabel n="6.0" title="Historical replay" right={<span className="meta">lead time before price move</span>} />
+      <SectionLabel title="Historical replay" right={<span className="meta">lead time</span>} />
       <div style={{ height: 200 }}>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 6, left: -20, bottom: 0 }}>

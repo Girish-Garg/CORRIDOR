@@ -15,11 +15,12 @@ export default {
         accent: "#e8913c",
       },
       fontFamily: {
-        sans: ['"Hanken Grotesk"', "sans-serif"],
+        sans: ['"Source Serif 4"', "serif"],
+        serif: ['"Source Serif 4"', "serif"],
         mono: ['"IBM Plex Mono"', "monospace"],
       },
       letterSpacing: {
-        tightest: "-0.03em",
+        tightest: "-0.01em",
       },
     },
   },

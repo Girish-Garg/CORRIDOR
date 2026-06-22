@@ -18,7 +18,7 @@ export function AgentStream({
         right={
           <span className="mono text-[13px] tnum text-accent">
             {totalMs != null
-              ? `${(totalMs / 1000).toFixed(1)}s signal to recommendation`
+              ? `${(totalMs / 1000).toFixed(1)}s to recommendation`
               : running
                 ? "streaming"
                 : "idle"}
