@@ -75,6 +75,8 @@ Editable assumptions (each is either a sourced fact or a clearly labeled modelin
 | reroute_premium | e.g. 3 to 5 USD/bbl | modeling knob |
 | tanker_rate_multiplier | e.g. 1.5x | modeling knob |
 
+Note on hormuz_dependency: this figure is itself debated, which is the whole point of making it an editable, sourced assumption. The problem statement cites 40 to 45 percent. Recent 2025 reporting suggests India has diversified its supply and the current share may be lower, with estimates varying by source and date (some put it near 30 percent). A judge can change this slider and watch the outcome move, which is exactly the falsifiability we want.
+
 Outputs, each traceable to its formula:
 - Barrels at risk per day = india_daily_imports * hormuz_dependency * closure_severity
 - Reserve cover for the gap (days) = reserve_days / (hormuz_dependency * closure_severity)
@@ -169,6 +171,6 @@ If behind: always keep Block D. Cut from the bottom of Block C first (connection
 
 ## Open items to confirm during Block A
 
-- Source and confirm the assumption defaults (the three background researchers are gathering these now).
+- Source and confirm the assumption defaults via web research in the main session during Block A. Note: spawned subagents in this environment are sandboxed without internet, so all live data gathering happens in the main thread.
 - Choose the exact historical episode for the replay based on data quality.
 - Finalize the alternative crude grade and route table for the seed.
