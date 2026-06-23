@@ -19,6 +19,7 @@ class SignalRef(BaseModel):
     severity: float
     bucket: str
     source_doc_id: str | None = None
+    url: str | None = None
 
 
 class RiskAssessment(BaseModel):

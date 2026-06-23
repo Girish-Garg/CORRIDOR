@@ -57,6 +57,15 @@ export type SignalRef = {
   severity: number
   bucket: string
   source_doc_id: string | null
+  url?: string | null
+}
+
+export type SignalStatus = {
+  live: boolean
+  live_count: number
+  latest_signal: string | null
+  last_fetch: string | null
+  sources: string[]
 }
 
 export type RiskAssessment = {
@@ -83,6 +92,9 @@ export type RunResult = {
   scope?: ScenarioScope
   route_method?: string
   total_ms?: number
+  unmatched?: boolean
+  supported?: string[]
+  query?: string
 }
 
 export async function runScenario(
@@ -95,5 +107,11 @@ export async function runScenario(
     body: JSON.stringify({ overrides, scope }),
   })
   if (!res.ok) throw new Error("scenario run failed")
+  return res.json()
+}
+
+export async function getSignalStatus(): Promise<SignalStatus> {
+  const res = await fetch("http://localhost:8000/signals/status")
+  if (!res.ok) throw new Error("signal status failed")
   return res.json()
 }

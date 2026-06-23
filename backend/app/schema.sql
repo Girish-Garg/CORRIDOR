@@ -42,3 +42,9 @@ CREATE TABLE IF NOT EXISTS signals (
   severity DOUBLE PRECISION NOT NULL,
   source_doc_id TEXT REFERENCES documents(id)
 );
+
+CREATE TABLE IF NOT EXISTS ingest_meta (
+  key TEXT PRIMARY KEY,
+  value TEXT NOT NULL,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);

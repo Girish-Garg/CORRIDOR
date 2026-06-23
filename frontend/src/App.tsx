@@ -49,6 +49,30 @@ function DisruptionBand({ risk }: { risk: RiskAssessment }) {
   )
 }
 
+function UnmatchedNotice({ supported, onPick }: { supported: string[]; onPick: (t: string) => void }) {
+  return (
+    <div className="panel p-8">
+      <SectionLabel title="Scenario not recognized" />
+      <p className="mt-2 max-w-2xl text-[15px] leading-relaxed text-muted">
+        This scenario does not map to a corridor the system currently models. It covers four
+        disruption types. Pick one to run it, or rephrase your scenario around one of these
+        corridors.
+      </p>
+      <div className="mt-5 flex flex-wrap gap-2">
+        {supported.map((s) => (
+          <button
+            key={s}
+            onClick={() => onPick(s)}
+            className="mono rounded border border-line px-3 py-2 text-[13px] text-fg transition-colors hover:border-accent hover:text-accent"
+          >
+            {s}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const { events, result, running, totalMs, runId, start, setResult } = useScenarioStream()
   const [tab, setTab] = useState<TabId>("risk")
@@ -110,7 +134,9 @@ export default function App() {
         </div>
         <main className="flex flex-1 flex-col gap-5 p-4 sm:p-7">
           <AgentStream events={events} totalMs={totalMs} running={running} />
-          {result ? (
+          {result?.unmatched ? (
+            <UnmatchedNotice supported={result.supported ?? []} onPick={runAndClose} />
+          ) : result ? (
             <>
               <div className="flex gap-1 overflow-x-auto border-b border-line">
                 {TABS.map((t) => {

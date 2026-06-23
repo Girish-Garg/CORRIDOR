@@ -41,7 +41,7 @@ def retrieve_signals(
     with get_conn() as conn, conn.cursor() as cur:
         cur.execute(
             """SELECT s.occurred_at, s.headline, s.severity, s.bucket, s.source_doc_id,
-                      COALESCE(d.title, '') || ' ' || COALESCE(d.body, '')
+                      COALESCE(d.title, '') || ' ' || COALESCE(d.body, ''), d.url
                FROM signals s LEFT JOIN documents d ON d.id = s.source_doc_id
                WHERE s.bucket = ANY(%s) ORDER BY s.occurred_at DESC""",
             (buckets,),
@@ -53,7 +53,7 @@ def retrieve_signals(
         haystack = f"{r[1]} {r[5] or ''}".lower()
         if not kws or any(k in haystack for k in kws):
             out.append(
-                SignalRef(occurred_at=str(r[0]), headline=r[1], severity=r[2], bucket=r[3], source_doc_id=r[4])
+                SignalRef(occurred_at=str(r[0]), headline=r[1], severity=r[2], bucket=r[3], source_doc_id=r[4], url=r[6])
             )
     return out[:limit]
 

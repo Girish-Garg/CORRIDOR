@@ -3,6 +3,7 @@ import time
 
 from app import repo
 from app.router import route_scenario
+from app.scopes import all_scopes
 from app.domain.risk import compute_risk
 from app.domain.trace import TraceEvent
 from app.domain.types import ScenarioInputs
@@ -44,6 +45,25 @@ async def run_stream(overrides: dict[str, float], query: str = ""):
     yield ("trace", ev(route_t0, "orchestrator", "start", "Interpreting scenario query with Claude", "claude", "live"))
     scope, method = await asyncio.to_thread(route_scenario, query)
     route_ms = int((time.monotonic() - route_t0) * 1000)
+    if scope is None:
+        yield (
+            "trace",
+            ev(route_t0, "orchestrator", "done",
+               "Scenario does not map to a corridor this system models. Supported: Hormuz, Red Sea, Russian crude, OPEC+.",
+               "claude", "live"),
+        )
+        yield (
+            "result",
+            {
+                "unmatched": True,
+                "query": query,
+                "supported": [s["title"] for s in all_scopes()],
+                "route_method": method,
+                "route_ms": route_ms,
+                "total_ms": 0,
+            },
+        )
+        return
     prov = "claude" if method == "claude" else "deterministic"
     yield (
         "trace",
